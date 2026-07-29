@@ -1,7 +1,0 @@
-ProductID,ProductName,SKU,CategoryID,SupplierID,CostPrice,SellingPrice,QuantityInStock,ReorderLevel
-1001,"Ballpoint Pen (Blue)","PEN-BLU-001",1,1,0.35,1.25,250,50
-1002,"A4 Notebook","NOTE-A4-001",1,1,1.20,3.99,120,30
-1003,"Wireless Mouse","MOU-WLS-001",2,2,12.50,24.99,40,10
-1004,"USB Flash Drive 64GB","USB64-001",2,2,6.75,14.99,65,15
-1005,"Office Chair","CHAIR-001",3,2,55.00,129.99,12,5
-1006,"Multi-Surface Cleaner","CLEAN-001",4,3,2.10,5.49,80,20
