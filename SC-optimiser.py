@@ -23,14 +23,25 @@ def read_data():
     product_df = pd.read_csv(PRODUCT_FILE, delimiter=',', index_col='ProductID')
     requirement_df = pd.read_csv(REQUIREMENT_FILE, delimiter=',', index_col='MaterialID')
 
-    # Access desired columns from dataframe
+    # Access desired columns from dataframes
     profits = product_df['ProfitPerUnit']
     variable_names = product_df['ProductName']
     machine_hours = product_df['MachineHours']
     labour_hours = product_df['LabourHours']
 
+    # Obtain constraint coefficients
+    mat_reqs = requirement_df.sort_index()
 
-    return profits, variable_names
+    for i in mat_reqs:
+        for j in mat_reqs['ProductID']:
+            coeff_i = mat_reqs[i] == j
+
+    '''
+    mat_filt_1 = mat_reqs["ProductID"] == 'FP001'
+    mats_for_1 = mat_reqs[mat_filt_1]
+    '''
+
+    return profits, variable_names, machine_hours, labour_hours, mats_for_1
 
 def lp_model(obj_coefs, dec_vars, const_coefs):
     '''
@@ -55,9 +66,9 @@ def test_function():
     var_names = data[1].to_dict
     constraint_matrix = []
 
-    lp_model(obj_coef_array, var_names, constraint_matrix)
+    #lp_model(obj_coef_array, var_names, constraint_matrix)
 
-    return None
+    return print(data[4])
 
 
 
