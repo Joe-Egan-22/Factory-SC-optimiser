@@ -4,6 +4,7 @@ import numpy as np
 
 # Product database input in csv format
 PRODUCT_FILE = 'Databases/Finishedproducts.csv'
+REQUIREMENT_FILE = 'Databases/BOMs.csv'
 
 
 def read_data():
@@ -12,10 +13,14 @@ def read_data():
     '''
     # Create dataframes
     product_df = pd.read_csv(PRODUCT_FILE, delimiter=',', index_col='ProductID')
+    requirement_df = pd.read_csv(REQUIREMENT_FILE, delimiter=',', index_col='MaterialID')
 
     # Access desired columns from dataframe
     profits = product_df['ProfitPerUnit']
     variable_names = product_df['ProductName']
+    machine_hours = product_df['MachineHours']
+    labour_hours = product_df['LabourHours']
+
 
     return profits, variable_names
 
