@@ -19,14 +19,16 @@ def read_data():
 
     return profits, variable_names
 
-def lp_model():
+def lp_model(obj_coefs, dec_vars, const_coefs):
     '''
     Creates the LP model
     '''
 
-    # define lp model
+    # Define lp model
     model = pulp.LpProblem('Profit Maximisation Problem', pulp.LpMaximize)
 
+    # Create variable names
+    X = pulp.LpVariable.dicts('Prod', (i for i in dec_vars), lowBound=0, cat='Continuous')
 
     return model
 
@@ -37,8 +39,12 @@ def test_function():
     data = read_data()
 
     obj_coef_array = np.array(data[0])
+    var_names = data[1].to_dict
+    constraint_matrix = []
 
-    return print(obj_coef_array)
+    lp_model(obj_coef_array, var_names, constraint_matrix)
+
+    return None
 
 
 
