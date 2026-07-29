@@ -1,0 +1,4 @@
+ProductID,ProductName,SKU,QuantityInStock,SellingPrice
+FP001,"Wooden Chair","CHAIR-001",35,129.99
+FP002,"Dining Table","TABLE-001",18,399.99
+FP003,"Coffee Table","COFFEE-001",42,189.99

@@ -1,0 +1,4 @@
+ProductionOrderID,ProductID,QuantityToProduce,StartDate,DueDate,Status
+PO1001,FP001,50,2026-07-20,2026-07-25,Completed
+PO1002,FP003,30,2026-07-28,2026-08-01,In Progress
+PO1003,FP002,15,2026-07-30,2026-08-05,Planned

@@ -1,0 +1,6 @@
+MaterialID,MaterialName,Unit,QuantityInStock,ReorderLevel,CostPerUnit,SupplierID
+RM001,"Pine Wood Plank","pieces",420,100,8.50,1
+RM002,"Steel Screws","boxes",160,40,4.25,2
+RM003,"Wood Glue","litres",75,20,6.80,3
+RM004,"White Paint","litres",48,15,12.50,3
+RM005,"Chair Legs","sets",95,20,15.00,2

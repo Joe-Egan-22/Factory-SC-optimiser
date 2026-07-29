@@ -1,0 +1,4 @@
+AssignmentID,ProductionOrderID,EmployeeID,HoursWorked
+1,PO1001,E001,16
+2,PO1001,E002,18
+3,PO1002,E003,8
