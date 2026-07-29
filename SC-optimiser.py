@@ -6,6 +6,14 @@ import numpy as np
 PRODUCT_FILE = 'Databases/Finishedproducts.csv'
 REQUIREMENT_FILE = 'Databases/BOMs.csv'
 
+'''
+FOLLOWING GLOBAL VARIABLES DECIDED BASED ON INTERNET SEARCH, 
+NOT INCLUDED IN DATA, NEEDS LATER MODIFICATION
+'''
+
+LABOUR_CONSTRAINT = 48 #hpw
+MACHINE_CONSTRAINT = 60 #hpw
+
 
 def read_data():
     '''
