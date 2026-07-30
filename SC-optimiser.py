@@ -32,12 +32,12 @@ def read_data():
     decision_var_names = product_df.index
     available_mats = inv_df['QuantityInStock']   
     mat_names = inv_df.index
-    time_constraints = product_df['MachineHours', 'LabourHours']
+    time_constraints = product_df[['MachineHours', 'LabourHours']]
     time_constraint_names = time_constraints.columns
 
     available_time_dict = {
-        'MaxLabour': MAX_LABOUR_TIME,
-        'MaxMachine': MAX_MACHINE_TIME
+        'MaxLabour': [MAX_LABOUR_TIME],
+        'MaxMachine': [MAX_MACHINE_TIME]
     }
 
     available_time = pd.DataFrame(available_time_dict)
@@ -51,7 +51,7 @@ def read_data():
 
     return {
         "Products": product_df,
-        "BOM": bom_df,
+        "BOM": bom_piv,
         "Inventory": inv_df,
         "Profits": profits,
         "DecisionNames": decision_var_names,
@@ -64,53 +64,15 @@ def read_data():
     }
 
 
-def lp_model(obj_coefs, dec_vars, mat_const_coefs, time_const_coefs, mat_constraint_names, time_constraint_names, mat_rhs, time_rhs):
+def lp_model(data):
     '''
     Creates the LP model
     '''
 
-    # Define lp model
-    model = pulp.LpProblem('Profit_Maximisation_Problem', pulp.LpMaximize)
-
-    # Create variable names
-    X = pulp.LpVariable.dicts('Prod', (i for i in dec_vars), lowBound=0, cat='Continuous')
-
-    # Create linear expression from objective coefficients
-    model += (
-        pulp.lpSum([
-            obj_coefs[i] * X[dec_vars[i]]
-            for i in range(len(X))
-        ])
-
-    ), 'profit'
-
-    # Use lpSum to create linear expressions from material constraint coefficients
-    for i in range(len(mat_const_coefs)):
-        model += pulp.lpSum([
-            mat_const_coefs[i][j] * X[dec_vars[j]]
-            for j in range(len(dec_vars))
-            ]) <= mat_rhs[i], mat_constraint_names[i]
-
-    # Use lpSum to create linear expressions from time constraint coefficients
-        for i in range(len(time_const_coefs)):
-            model += pulp.lpSum([
-                time_const_coefs[i][j] * X[dec_vars[j]]
-                for j in range(len(dec_vars))
-                ]) <= time_rhs[i], time_constraint_names[i]
-
-
-    return
-
-def test_function():
-    '''
-    Function to test outputs of individual functions.
-    '''
-    data = read_data()
-
     # LHS Coefficients
     objective_coeffs = data["Profits"]
     mat_constraint_coeffs = data["MaterialCoeffs"]
-    time_constraint_coeffs = data['MachineHours,LabourHours']
+    time_constraint_coeffs = data['ProductionTimes']
 
     # RHS Coefficients
     mat_rhs = data['AvailableMats']
@@ -122,10 +84,67 @@ def test_function():
     time_constraint_names = data["TimeConstraintNames"]
 
 
-    lp_prob = lp_model(obj_vector, var_names, mat_constraint_matrix, time_constraint_matrix, mat_constraint_names, time_constraint_names, max_mats, max_times)
+    # Define lp model
+    model = pulp.LpProblem('Profit_Maximisation_Problem', pulp.LpMaximize)
 
-    return print(time_constraint_names, mat_constraint_names)
+    # Create variable names
+    X = pulp.LpVariable.dicts('Prod', decision_var_names, lowBound=0, cat='Continuous')
 
+    # Create linear expression from objective coefficients
+    model += pulp.lpSum(
+    data['Products'].loc[p, "ProfitPerUnit"] * X[p]
+    for p in data['Products'].index
+)
+
+    # Using lpSum to create linear expression for material constraints
+    for material in data['BOM'].index:
+
+        model += (
+            pulp.lpSum(
+                data['BOM'].loc[material, product] * X[product]
+                for product in data['Products'].index
+            )
+            <= data['Inventory'].loc[material, "QuantityInStock"],
+            material
+        )
+
+    model += (
+    pulp.lpSum(
+        data['Products'].loc[p, "MachineHours"] * X[p]
+        for p in data['Products'].index
+    )
+    <= MAX_MACHINE_TIME,
+    "MachineHours"
+)
+
+    model += (
+        pulp.lpSum(
+            data['Products'].loc[p, "LabourHours"] * X[p]
+            for p in data['Products'].index
+        )
+        <= MAX_LABOUR_TIME,
+        "LabourHours"
+    )
+
+    model.solve()
+    print('')
+    print(pulp.LpStatus[model.status])
+    for p in data['Products'].index:
+        print(f"{p}: {X[p].value():.2f}")
+
+    print("Profit =", pulp.value(model.objective))
+
+    return
+
+def test_function():
+    '''
+    Function to test outputs of individual functions.
+    '''
+    data = read_data()
+
+    model = lp_model(data)
+
+    return 
 
 
 test_function()
