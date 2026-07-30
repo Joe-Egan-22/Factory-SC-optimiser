@@ -33,6 +33,7 @@ def read_data():
     available_mats = inv_df['QuantityInStock']   
     mat_names = inv_df.index
     time_constraints = product_df[['MachineHours', 'LabourHours']]
+    time_constraints_trans = time_constraints.transpose()
     time_constraint_names = time_constraints.columns
 
     available_time_dict = {
@@ -55,7 +56,7 @@ def read_data():
         "Inventory": inv_df,
         "Profits": profits,
         "DecisionNames": decision_var_names,
-        "ProductionTimes":time_constraints,
+        "ProductionTimes":time_constraints_trans,
         "AvailableMats": available_mats,
         "MatNames": mat_names,
         "TimeConstraintNames": time_constraint_names,
@@ -90,41 +91,36 @@ def lp_model(data):
     # Create variable names
     X = pulp.LpVariable.dicts('Prod', decision_var_names, lowBound=0, cat='Continuous')
 
+
     # Create linear expression from objective coefficients
     model += pulp.lpSum(
-    data['Products'].loc[p, "ProfitPerUnit"] * X[p]
-    for p in data['Products'].index
-)
+        objective_coeffs[p] * X[p]
+        for p in objective_coeffs.index
+    )
 
     # Using lpSum to create linear expression for material constraints
-    for material in data['BOM'].index:
+    for material in mat_constraint_coeffs.index:
 
         model += (
             pulp.lpSum(
-                data['BOM'].loc[material, product] * X[product]
-                for product in data['Products'].index
+                mat_constraint_coeffs.loc[material, product] * X[product]
+                for product in decision_var_names
             )
-            <= data['Inventory'].loc[material, "QuantityInStock"],
+            <= mat_rhs[material],
             material
         )
 
-    model += (
-    pulp.lpSum(
-        data['Products'].loc[p, "MachineHours"] * X[p]
-        for p in data['Products'].index
-    )
-    <= MAX_MACHINE_TIME,
-    "MachineHours"
-)
+    for kind in time_constraint_coeffs.index: 
 
-    model += (
+        model += (
         pulp.lpSum(
-            data['Products'].loc[p, "LabourHours"] * X[p]
-            for p in data['Products'].index
+            time_constraint_coeffs.loc[kind, prod] * X[prod]
+            for prod in decision_var_names
         )
-        <= MAX_LABOUR_TIME,
-        "LabourHours"
+        <= MAX_MACHINE_TIME,
+        kind
     )
+
 
     model.solve()
     print('')
@@ -144,7 +140,6 @@ def test_function():
 
     model = lp_model(data)
 
-    return 
-
+    return #print(data['ProductionTimes'])
 
 test_function()
