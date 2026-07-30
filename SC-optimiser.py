@@ -5,6 +5,7 @@ import numpy as np
 # Product database input in csv format
 PRODUCT_FILE = 'Databases/Finishedproducts.csv'
 BOM_FILE = 'Databases/BOMs.csv'
+INVENTORY_FILE = 'Databases/Rawmaterials.csv'
 
 '''
 FOLLOWING GLOBAL VARIABLES DECIDED BASED ON INTERNET SEARCH, 
@@ -22,6 +23,7 @@ def read_data():
     # Create dataframes
     product_df = pd.read_csv(PRODUCT_FILE, delimiter=',', index_col='ProductID')
     bom_df = pd.read_csv(BOM_FILE, delimiter=',', index_col='MaterialID')
+    inv_df = pd.read_csv(INVENTORY_FILE, delimiter=',',index_col='MaterialID')
 
     # Access desired columns from dataframes
     profits = product_df['ProfitPerUnit']
