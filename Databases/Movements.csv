@@ -1,5 +1,5 @@
 MovementID,ItemType,ItemID,MovementType,Quantity,Date
-1,"Raw Material",RM001,"Purchase",500,2026-07-10
-2,"Raw Material",RM001,"Production Consumption",-200,2026-07-20
-3,"Finished Product",FP001,"Production Complete",50,2026-07-25
-4,"Finished Product",FP001,"Customer Shipment",-12,2026-07-27
+1,Raw Material,RM001,Purchase,500,10/07/2026
+2,Raw Material,RM001,Production Consumption,-200,20/07/2026
+3,Finished Product,FP001,Production Complete,50,25/07/2026
+4,Finished Product,FP001,Customer Shipment,-12,27/07/2026
