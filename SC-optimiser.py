@@ -43,9 +43,9 @@ def read_data():
     mats_for_1 = mat_reqs[mat_filt_1]
     '''
 
-    return profits, variable_names, machine_hours, labour_hours, mat_coefs
+    return profits, variable_names, machine_hours, labour_hours, mat_coefs, mat_constraints, mat_constraint_names, time_constraint_names
 
-def lp_model(obj_coefs, dec_vars, const_coefs):
+def lp_model(obj_coefs, dec_vars, mat_const_coefs, time_const_coefs, mat_constraint_names, time_constraint_names, mat_rhs, time_rhs):
     '''
     Creates the LP model
     '''
@@ -64,11 +64,24 @@ def test_function():
     '''
     data = read_data()
 
-    obj_coef_array = np.array(data[0])
-    var_names = data[1].to_dict
-    constraint_matrix = data[4]
+    obj_vector = data[0].to_numpy()
+    var_names = data[1]
 
-    lp_model(obj_coef_array, var_names, constraint_matrix)
+    mat_constraint_names = data[6]
+    time_constraint_names = data[7]
+
+    # Make matrix of time constraints
+    machine_constraint_array = data[2].to_numpy()
+    labour_constraint_array = data[3].to_numpy()
+    time_constraint_matrix = np.vstack((machine_constraint_array, labour_constraint_array))
+
+    mat_constraint_matrix = data[4].to_numpy()
+
+    # RHS of constraints
+    max_mats = data[5].to_numpy()
+    max_times = np.array([MACHINE_CONSTRAINT, LABOUR_CONSTRAINT])
+
+    #lp_prob = lp_model(obj_vector, var_names, mat_constraint_matrix, time_constraint_matrix, mat_constraint_names, time_constraint_names, max_mats, max_times)
 
     return print(data[4])
 
