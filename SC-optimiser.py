@@ -53,7 +53,7 @@ def lp_model(obj_coefs, dec_vars, mat_const_coefs, time_const_coefs, mat_constra
     '''
 
     # Define lp model
-    model = pulp.LpProblem('Profit Maximisation Problem', pulp.LpMaximize)
+    model = pulp.LpProblem('Profit_Maximisation_Problem', pulp.LpMaximize)
 
     # Create variable names
     X = pulp.LpVariable.dicts('Prod', (i for i in dec_vars), lowBound=0, cat='Continuous')
