@@ -58,7 +58,31 @@ def lp_model(obj_coefs, dec_vars, mat_const_coefs, time_const_coefs, mat_constra
     # Create variable names
     X = pulp.LpVariable.dicts('Prod', (i for i in dec_vars), lowBound=0, cat='Continuous')
 
-    return model
+    # Create linear expression from objective coefficients
+    model += (
+        pulp.lpSum([
+            obj_coefs[i] * X[dec_vars[i]]
+            for i in range(len(X))
+        ])
+
+    ), 'profit'
+
+    # Use lpSum to create linear expressions from material constraint coefficients
+    for i in range(len(mat_const_coefs)):
+        model += pulp.lpSum([
+            mat_const_coefs[i][j] * X[dec_vars[j]]
+            for j in range(len(dec_vars))
+            ]) <= mat_rhs[i], mat_constraint_names[i]
+
+    # Use lpSum to create linear expressions from time constraint coefficients
+        for i in range(len(time_const_coefs)):
+            model += pulp.lpSum([
+                time_const_coefs[i][j] * X[dec_vars[j]]
+                for j in range(len(dec_vars))
+                ]) <= time_rhs[i], time_constraint_names[i]
+
+
+    return
 
 def test_function():
     '''
