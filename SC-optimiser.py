@@ -25,10 +25,12 @@ def read_data():
 
     # Access desired columns from dataframes
     profits = product_df['ProfitPerUnit']
-    variable_names = product_df['ProductName']
+    variable_names = product_df.index
     machine_hours = product_df['MachineHours']
     labour_hours = product_df['LabourHours']
-
+    mat_constraints = inv_df['QuantityInStock']
+    mat_constraint_names = inv_df.index
+    time_constraint_names = ['Machine_Hours', 'Labour_Hours']
 
     # Pivot bom table to more convenient format
     bom_piv = (bom_df.pivot_table(index='MaterialID', columns='ProductID',values='QuantityRequired',fill_value=0))
