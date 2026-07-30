@@ -109,7 +109,7 @@ def test_function():
 
     #lp_prob = lp_model(obj_vector, var_names, mat_constraint_matrix, time_constraint_matrix, mat_constraint_names, time_constraint_names, max_mats, max_times)
 
-    return print(data[4])
+    return print(time_constraint_names, mat_constraint_names)
 
 
 
