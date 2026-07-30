@@ -18,34 +18,46 @@ MACHINE_CONSTRAINT = 60 #hpw
 
 def read_data():
     '''
-    Create pandas dataframes from csv files in directory
+    Create pandas dataframes from csv files in directory.
+    Extracting relevant data from these dataframes.
+    Returning as a dictionary
     '''
     # Create dataframes
     product_df = pd.read_csv(PRODUCT_FILE, delimiter=',', index_col='ProductID')
-    bom_df = pd.read_csv(BOM_FILE, delimiter=',', index_col='MaterialID')
+    bom_df = pd.read_csv(BOM_FILE, delimiter=',')
     inv_df = pd.read_csv(INVENTORY_FILE, delimiter=',',index_col='MaterialID')
 
     # Access desired columns from dataframes
     profits = product_df['ProfitPerUnit']
-    variable_names = product_df.index
+    decision_var_names = product_df.index
     machine_hours = product_df['MachineHours']
     labour_hours = product_df['LabourHours']
-    mat_constraints = inv_df['QuantityInStock']
-    mat_constraint_names = inv_df.index
-    time_constraint_names = ['Machine_Hours', 'Labour_Hours']
-
+    available_mats = inv_df['QuantityInStock']   
+    mat_names = inv_df.index
+    time_constraint_names = pd.DataFrame("MachineHours", "LabourHours")
+    
     # Pivot bom table to more convenient format
     bom_piv = (bom_df.pivot_table(index='MaterialID', columns='ProductID',values='QuantityRequired',fill_value=0))
 
     # Access coefficients of material constraints
     mat_coefs = bom_piv
 
-    '''
-    mat_filt_1 = mat_reqs["ProductID"] == 'FP001'
-    mats_for_1 = mat_reqs[mat_filt_1]
-    '''
 
-    return profits, variable_names, machine_hours, labour_hours, mat_coefs, mat_constraints, mat_constraint_names, time_constraint_names
+    return {
+        "Products": product_df,
+        "BOM": bom_df,
+        "Inventory": inv_df,
+        "Profits": profits,
+        "DecisionNames": decision_var_names,
+        "MachineHours": machine_hours,
+        "LabourHours": labour_hours,
+        "AvailableMats": available_mats,
+        "MatNames": mat_names,
+        "TimeConstraintNames": time_constraint_names,
+        "MaterialCoeffs": mat_coefs
+
+    }
+
 
 def lp_model(obj_coefs, dec_vars, mat_const_coefs, time_const_coefs, mat_constraint_names, time_constraint_names, mat_rhs, time_rhs):
     '''
