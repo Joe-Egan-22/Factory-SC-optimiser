@@ -12,8 +12,8 @@ FOLLOWING GLOBAL VARIABLES DECIDED BASED ON INTERNET SEARCH,
 NOT INCLUDED IN DATA, NEEDS LATER MODIFICATION
 '''
 
-LABOUR_CONSTRAINT = 48 #hpw
-MACHINE_CONSTRAINT = 60 #hpw
+MAX_LABOUR_TIME = 48 #hpw
+MAX_MACHINE_TIME = 60 #hpw
 
 
 def read_data():
@@ -30,11 +30,17 @@ def read_data():
     # Access desired columns from dataframes
     profits = product_df['ProfitPerUnit']
     decision_var_names = product_df.index
-    machine_hours = product_df['MachineHours']
-    labour_hours = product_df['LabourHours']
     available_mats = inv_df['QuantityInStock']   
     mat_names = inv_df.index
-    time_constraint_names = pd.DataFrame("MachineHours", "LabourHours")
+    time_constraints = product_df['MachineHours', 'LabourHours']
+    time_constraint_names = time_constraints.columns
+
+    available_time_dict = {
+        'MaxLabour': MAX_LABOUR_TIME,
+        'MaxMachine': MAX_MACHINE_TIME
+    }
+
+    available_time = pd.DataFrame(available_time_dict)
     
     # Pivot bom table to more convenient format
     bom_piv = (bom_df.pivot_table(index='MaterialID', columns='ProductID',values='QuantityRequired',fill_value=0))
@@ -49,13 +55,12 @@ def read_data():
         "Inventory": inv_df,
         "Profits": profits,
         "DecisionNames": decision_var_names,
-        "MachineHours": machine_hours,
-        "LabourHours": labour_hours,
+        "ProductionTimes":time_constraints,
         "AvailableMats": available_mats,
         "MatNames": mat_names,
         "TimeConstraintNames": time_constraint_names,
-        "MaterialCoeffs": mat_coefs
-
+        "MaterialCoeffs": mat_coefs,
+        "AvailableTime": available_time
     }
 
 
@@ -102,24 +107,22 @@ def test_function():
     '''
     data = read_data()
 
-    obj_vector = data[0].to_numpy()
-    var_names = data[1]
+    # LHS Coefficients
+    objective_coeffs = data["Profits"]
+    mat_constraint_coeffs = data["MaterialCoeffs"]
+    time_constraint_coeffs = data['MachineHours,LabourHours']
 
-    mat_constraint_names = data[6]
-    time_constraint_names = data[7]
+    # RHS Coefficients
+    mat_rhs = data['AvailableMats']
+    time_rhs = data['AvailableTime']
 
-    # Make matrix of time constraints
-    machine_constraint_array = data[2].to_numpy()
-    labour_constraint_array = data[3].to_numpy()
-    time_constraint_matrix = np.vstack((machine_constraint_array, labour_constraint_array))
+    # Names
+    decision_var_names = data["DecisionNames"]
+    mat_constraint_names = data["MatNames"]
+    time_constraint_names = data["TimeConstraintNames"]
 
-    mat_constraint_matrix = data[4].to_numpy()
 
-    # RHS of constraints
-    max_mats = data[5].to_numpy()
-    max_times = np.array([MACHINE_CONSTRAINT, LABOUR_CONSTRAINT])
-
-    #lp_prob = lp_model(obj_vector, var_names, mat_constraint_matrix, time_constraint_matrix, mat_constraint_names, time_constraint_names, max_mats, max_times)
+    lp_prob = lp_model(obj_vector, var_names, mat_constraint_matrix, time_constraint_matrix, mat_constraint_names, time_constraint_names, max_mats, max_times)
 
     return print(time_constraint_names, mat_constraint_names)
 
