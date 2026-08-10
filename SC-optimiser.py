@@ -113,24 +113,28 @@ def lp_model(data):
     for kind in time_constraint_coeffs.index: 
 
         model += (
-        pulp.lpSum(
-            time_constraint_coeffs.loc[kind, prod] * X[prod]
-            for prod in decision_var_names
-        )
-        <= MAX_MACHINE_TIME,
-        kind
-    )
-
-
+def solve_model(model): # may not work, need to fix create_lp_model first
+    '''
+    Solves and displays LP model
+    '''
+    # Solve model
     model.solve()
+
+    # Display solution
+    print('-------------------------------------')
+    print('               SOLUTION              ')
+    print('-------------------------------------')
+
     print('')
     print(pulp.LpStatus[model.status])
-    for p in data['Products'].index:
-        print(f"{p}: {X[p].value():.2f}")
+    print('')
+
+    for v in model.variables():
+        print(f"{v}: {v.value():.2f}")
 
     print("Profit =", pulp.value(model.objective))
 
-    return
+    return None
 
 def test_function():
     '''
