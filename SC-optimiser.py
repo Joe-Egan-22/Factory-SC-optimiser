@@ -36,6 +36,7 @@ def read_data():
     time_constraints_trans = time_constraints.transpose()
     time_constraint_names = time_constraints.columns
 
+    # Creating dataframe for maximum time for machining and labour (not given in CSV)
     available_time_dict = {
         'MaxLabour': [MAX_LABOUR_TIME],
         'MaxMachine': [MAX_MACHINE_TIME]
