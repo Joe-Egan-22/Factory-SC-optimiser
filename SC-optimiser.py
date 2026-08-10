@@ -28,62 +28,46 @@ def read_data():
     inv_df = pd.read_csv(INVENTORY_FILE, delimiter=',',index_col='MaterialID')
 
     # Access desired columns from dataframes
-    profits = product_df['ProfitPerUnit']
-    decision_var_names = product_df.index
-    available_mats = inv_df['QuantityInStock']   
-    mat_names = inv_df.index
     time_constraints = product_df[['MachineHours', 'LabourHours']]
-    time_constraints_trans = time_constraints.transpose()
     time_constraint_names = time_constraints.columns
 
     # Creating dataframe for maximum time for machining and labour (not given in CSV)
     available_time_dict = {
-        'MaxLabour': [MAX_LABOUR_TIME],
-        'MaxMachine': [MAX_MACHINE_TIME]
+        'LabourHours': [MAX_LABOUR_TIME],
+        'MachineHours': [MAX_MACHINE_TIME]
     }
-
     available_time = pd.DataFrame(available_time_dict)
     
     # Pivot bom table to more convenient format
     bom_piv = (bom_df.pivot_table(index='MaterialID', columns='ProductID',values='QuantityRequired',fill_value=0))
 
-    # Access coefficients of material constraints
-    mat_coefs = bom_piv
-
-
     return {
         "Products": product_df,
         "BOM": bom_piv,
         "Inventory": inv_df,
-        "Profits": profits,
-        "DecisionNames": decision_var_names,
-        "ProductionTimes":time_constraints_trans,
-        "AvailableMats": available_mats,
-        "MatNames": mat_names,
         "TimeConstraintNames": time_constraint_names,
-        "MaterialCoeffs": mat_coefs,
         "AvailableTime": available_time
     }
 
 
-def lp_model(data):
+def create_lp_model(data):
     '''
     Creates the LP model
     '''
-
+    
     # LHS Coefficients
-    objective_coeffs = data["Profits"]
-    mat_constraint_coeffs = data["MaterialCoeffs"]
-    time_constraint_coeffs = data['ProductionTimes']
+    objective_coeffs = data["Products"]['ProfitPerUnit']
+    mat_constraint_coeffs = data["BOM"]
+    time_constraint_coeffs = data['Products'][['MachineHours', 'LabourHours']].transpose()
 
     # RHS Coefficients
-    mat_rhs = data['AvailableMats']
-    time_rhs = data['AvailableTime']
+    mat_rhs = data['Inventory']['QuantityInStock']
+    time_rhs = data['AvailableTime'] # Need to have these in CSV
 
     # Names
-    decision_var_names = data["DecisionNames"]
-    mat_constraint_names = data["MatNames"]
-    time_constraint_names = data["TimeConstraintNames"]
+    decision_var_names = data["Products"].index
+    mat_constraint_names = data["Inventory"].index
+    time_constraint_names = time_constraint_coeffs.index # Need to access these better
 
 
     # Define lp model
@@ -111,9 +95,19 @@ def lp_model(data):
             material
         )
 
-    for kind in time_constraint_coeffs.index: 
+    for constr in time_constraint_coeffs.index: 
 
         model += (
+            pulp.lpSum(
+                time_constraint_coeffs.loc[constr, prod] * X[prod]
+                for prod in decision_var_names
+            )
+            <= time_rhs[constr],
+            constr
+        )
+
+    return model
+
 def solve_model(model): # may not work, need to fix create_lp_model first
     '''
     Solves and displays LP model
@@ -143,8 +137,10 @@ def test_function():
     '''
     data = read_data()
 
-    model = lp_model(data)
+    model = create_lp_model(data)
 
-    return #print(data['ProductionTimes'])
+    solve_model(model)
+
+    return #print(data['Products'][['MachineHours', 'LabourHours']].transpose().index)
 
 test_function()
