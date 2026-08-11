@@ -79,7 +79,7 @@ def create_lp_model(data):
     model = pulp.LpProblem('Profit_Maximisation_Problem', pulp.LpMaximize)
 
     # Create variable names
-    X = pulp.LpVariable.dicts('Prod', decision_var_names, lowBound=0, cat='Continuous')
+    X = pulp.LpVariable.dicts('Product', decision_var_names, lowBound=0, cat='Continuous')
 
     # Create linear expression from objective coefficients
     model += pulp.lpSum(
@@ -116,8 +116,8 @@ def solve_model(model): # may not work, need to fix create_lp_model first
     '''
     Solves and displays LP model
     '''
-    # Solve model
-    model.solve()
+    # Solve model without solver log noise
+    model.solve(pulp.PULP_CBC_CMD(msg=False))
 
     # Display solution
     print('-------------------------------------')
