@@ -27,10 +27,6 @@ def read_data():
     bom_df = pd.read_csv(BOM_FILE, delimiter=',')
     inv_df = pd.read_csv(INVENTORY_FILE, delimiter=',',index_col='MaterialID')
 
-    # Access desired columns from dataframes
-    time_constraints = product_df[['MachineHours', 'LabourHours']]
-    time_constraint_names = time_constraints.columns
-
     # Creating dataframe for maximum time for machining and labour (not given in CSV)
     available_time_dict = {
         'LabourHours': [MAX_LABOUR_TIME],
@@ -58,7 +54,6 @@ def read_data():
         "Products": product_df,
         "BOM": bom_piv,
         "Inventory": inv_df,
-        "TimeConstraintNames": time_constraint_names,
         "AvailableTime": available_time
     }
 
@@ -79,16 +74,12 @@ def create_lp_model(data):
 
     # Names
     decision_var_names = data["Products"].index
-    mat_constraint_names = data["Inventory"].index
-    time_constraint_names = time_constraint_coeffs.index # Need to access these better
-
 
     # Define lp model
     model = pulp.LpProblem('Profit_Maximisation_Problem', pulp.LpMaximize)
 
     # Create variable names
     X = pulp.LpVariable.dicts('Prod', decision_var_names, lowBound=0, cat='Continuous')
-
 
     # Create linear expression from objective coefficients
     model += pulp.lpSum(
@@ -154,6 +145,6 @@ def test_function():
 
     solve_model(model)
 
-    return #print(data['Products'][['MachineHours', 'LabourHours']].transpose().index)
+    return
 
 test_function()
