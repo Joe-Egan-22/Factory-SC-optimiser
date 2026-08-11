@@ -57,6 +57,34 @@ def read_data():
         "AvailableTime": available_time
     }
 
+def check_columns(df, required_cols, name):
+    '''
+    Checks for expected columns
+    '''
+
+    missing = set(required_cols) - set(df.columns)
+
+    if missing:
+        raise ValueError(
+            f'{name} is missing columns: {sorted(missing)}'
+        )
+
+    return None
+
+def validate_data(data):
+    '''
+    Validates input data,
+    Ensures dataframes contain necessary information and are labelled correctly
+    '''
+
+    # 1) Check columns of each dataframe
+    check_columns(data["Products"], {'ProfitPerUnit', 'MachineHours', 'LabourHours'}, "Products")
+    check_columns(data["BOM"], data['Products'].index, "BOM")
+    check_columns(data["Inventory"], {'QuantityInStock'}, "Inventory")
+
+    
+
+    return
 
 def create_lp_model(data):
     '''
@@ -117,7 +145,7 @@ def solve_model(model): # may not work, need to fix create_lp_model first
     Solves and displays LP model
     '''
     # Solve model
-    model.solve()
+    model.solve(pulp.PULP_CBC_CMD(msg=False))
 
     # Display solution
     print('-------------------------------------')
@@ -141,9 +169,11 @@ def test_function():
     '''
     data = read_data()
 
-    model = create_lp_model(data)
+    validate_data(data)
 
-    solve_model(model)
+    #model = create_lp_model(data)
+
+    #solve_model(model)
 
     return None
 
