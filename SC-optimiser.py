@@ -39,8 +39,21 @@ def read_data():
     available_time = pd.DataFrame(available_time_dict)
     
     # Pivot bom table to more convenient format
-    bom_piv = (bom_df.pivot_table(index='MaterialID', columns='ProductID',values='QuantityRequired',fill_value=0))
-
+    bom_piv = (
+        bom_df
+        .pivot_table(
+            index='MaterialID',
+            columns='ProductID',
+            values='QuantityRequired',
+            aggfunc = 'sum',
+            fill_value=0,
+        )
+        .reindex(
+            index = inv_df.index,
+            columns = product_df.index,
+            fill_value=0,
+        )
+    )
     return {
         "Products": product_df,
         "BOM": bom_piv,
