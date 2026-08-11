@@ -145,6 +145,6 @@ def test_function():
 
     solve_model(model)
 
-    return
+    return None
 
 test_function()
