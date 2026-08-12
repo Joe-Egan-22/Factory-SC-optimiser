@@ -71,6 +71,21 @@ def check_names(df, required_cols, name):
 
     return
 
+def check_nulls(df, name):
+    '''
+    Checks for missing/null values within a dataframe
+    '''
+
+    missing = df.isnull().sum()
+    missing_cols = missing[missing > 0]
+
+    if len(missing_cols) > 0:
+        print(
+            f'{name} is missing values in columns: {missing_cols}'
+        )
+
+
+    return
 
 def validate_data(data):
     '''
@@ -83,7 +98,11 @@ def validate_data(data):
     check_names(data["BOM"], data['Products'].index, "BOM")
     check_names(data["Inventory"], {'QuantityInStock'}, "Inventory")
 
-    
+    # 2) Check for null values within each dataframe
+    check_nulls(data['Products'], "Products")
+    check_nulls(data['BOM'], "BOM")
+    check_nulls(data['Inventory'], "Inventory")
+
 
     return
 
