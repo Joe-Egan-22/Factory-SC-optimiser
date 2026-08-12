@@ -183,7 +183,7 @@ def solve_model(model): # may not work, need to fix create_lp_model first
 
     return None
 
-def test_function():
+def main():
     '''
     Function to test outputs of individual functions.
     '''
@@ -195,6 +195,6 @@ def test_function():
 
     #solve_model(model)
 
-    return None
+    return print('Main is running')
 
-test_function()
+if __name__ == "__main__": main()
