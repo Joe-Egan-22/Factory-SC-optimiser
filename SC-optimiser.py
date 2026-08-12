@@ -57,7 +57,7 @@ def read_data():
         "AvailableTime": available_time
     }
 
-def check_columns(df, required_cols, name):
+def check_names(df, required_cols, name):
     '''
     Checks for expected columns
     '''
@@ -69,7 +69,8 @@ def check_columns(df, required_cols, name):
             f'{name} is missing columns: {sorted(missing)}'
         )
 
-    return None
+    return
+
 
 def validate_data(data):
     '''
@@ -78,9 +79,9 @@ def validate_data(data):
     '''
 
     # 1) Check columns of each dataframe
-    check_columns(data["Products"], {'ProfitPerUnit', 'MachineHours', 'LabourHours'}, "Products")
-    check_columns(data["BOM"], data['Products'].index, "BOM")
-    check_columns(data["Inventory"], {'QuantityInStock'}, "Inventory")
+    check_names(data["Products"], {'ProfitPerUnit', 'MachineHours', 'LabourHours'}, "Products")
+    check_names(data["BOM"], data['Products'].index, "BOM")
+    check_names(data["Inventory"], {'QuantityInStock'}, "Inventory")
 
     
 
