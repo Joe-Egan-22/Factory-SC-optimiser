@@ -112,16 +112,16 @@ def check_nulls(df, name):
 
     return
 
-def check_repeats(df, name):
+def check_repeats(values, name):
     '''
     Checks for duplicate rows within dataframe
     '''
 
-    duplicates = df.duplicated()
+    duplicates = values[values.duplicated()]
 
-    if duplicates.any():
+    if len(duplicates) > 0:
         raise ValueError(
-            f'{df[duplicates]} is not unique in {name}'
+            f'{name} contains duplicate IDs: {duplicates.tolist()}'
         )
         
 
