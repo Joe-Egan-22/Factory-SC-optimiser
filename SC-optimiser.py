@@ -33,6 +33,10 @@ def read_data():
         'MachineHours': [MAX_MACHINE_TIME]
     }
     available_time = pd.DataFrame(available_time_dict)
+
+    # Check the BOM dataframe before modification
+    check_cols(bom_df, {"ProductID", "MaterialID"}, "BOM")
+    cross_check(bom_df, product_df, inv_df)
     
     # Pivot bom table to more convenient format
     bom_piv = (
@@ -57,7 +61,7 @@ def read_data():
         "AvailableTime": available_time
     }
 
-def check_names(df, required_cols, name):
+def check_cols(df, required_cols, name):
     '''
     Checks for expected columns
     '''
@@ -67,6 +71,26 @@ def check_names(df, required_cols, name):
     if missing:
         raise ValueError(
             f'{name} is missing columns: {sorted(missing)}'
+        )
+
+    return
+
+def cross_check(bom, product, inventory):
+    '''
+    Checks if whether product and material IDs match between dataframes
+    '''
+
+    missing_products = set(bom["ProductID"]) - set(product.index)
+    missing_materials = set(bom["MaterialID"]) - set(inventory.index)
+
+    if missing_products:
+        raise ValueError(
+            f'Product IDs do not match between the BOM and Finished product databases.'
+        )
+
+    if missing_materials:
+        raise ValueError(
+            f'Material IDs do not match between the BOM and Inventory databases.'
         )
 
     return
@@ -94,14 +118,16 @@ def validate_data(data):
     '''
 
     # 1) Check columns of each dataframe
-    check_names(data["Products"], {'ProfitPerUnit', 'MachineHours', 'LabourHours'}, "Products")
-    check_names(data["BOM"], data['Products'].index, "BOM")
-    check_names(data["Inventory"], {'QuantityInStock'}, "Inventory")
+    check_cols(data["Products"], {'ProfitPerUnit', 'MachineHours', 'LabourHours'}, "Products")
+    # BOM is checked in read_data()
+    check_cols(data["Inventory"], {'QuantityInStock'}, "Inventory")
 
     # 2) Check for null values within each dataframe
     check_nulls(data['Products'], "Products")
     check_nulls(data['BOM'], "BOM")
     check_nulls(data['Inventory'], "Inventory")
+
+
 
 
     return
@@ -195,6 +221,6 @@ def main():
 
     #solve_model(model)
 
-    return print('Main is running')
+    return
 
 if __name__ == "__main__": main()
