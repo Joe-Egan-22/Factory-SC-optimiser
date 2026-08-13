@@ -37,6 +37,7 @@ def read_data():
     # Check the BOM dataframe before modification
     check_cols(bom_df, {"ProductID", "MaterialID"}, "BOM")
     cross_check(bom_df, product_df, inv_df)
+    check_repeats(bom_df[["ProductID", "MaterialID"]], 'BOM')
     
     # Pivot bom table to more convenient format
     bom_piv = (
@@ -58,7 +59,8 @@ def read_data():
         "Products": product_df,
         "BOM": bom_piv,
         "Inventory": inv_df,
-        "AvailableTime": available_time
+        "AvailableTime": available_time,
+        "OBOM": bom_df
     }
 
 def check_cols(df, required_cols, name):
@@ -108,6 +110,20 @@ def check_nulls(df, name):
             f'{name} is missing values in columns: {missing_cols}'
         )
 
+    return
+
+def check_repeats(df, name):
+    '''
+    Checks for duplicate rows within dataframe
+    '''
+
+    duplicates = df.duplicated()
+
+    if duplicates.any():
+        raise ValueError(
+            f'{df[duplicates]} is not unique in {name}'
+        )
+        
 
     return
 
@@ -127,8 +143,10 @@ def validate_data(data):
     check_nulls(data['BOM'], "BOM")
     check_nulls(data['Inventory'], "Inventory")
 
-
-
+    # 2) Check for repeats in product/material IDs
+    check_repeats(data['Products'].index, 'Products')
+    # BOM checked in read_data()
+    check_repeats(data['Inventory'].index, 'Inventory')
 
     return
 
@@ -221,6 +239,7 @@ def main():
 
     #solve_model(model)
 
-    return
+    return #print(data['OBOM'][data['OBOM'][['ProductID','MaterialID']].duplicated()])
 
 if __name__ == "__main__": main()
+
