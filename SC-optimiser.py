@@ -106,8 +106,8 @@ def check_nulls(df, name):
     missing_cols = missing[missing > 0]
 
     if len(missing_cols) > 0:
-        print(
-            f'{name} is missing values in columns: {missing_cols}'
+        raise ValueError(
+            f'{name} is missing values in columns: {missing_cols.to_dict()}'
         )
 
     return
