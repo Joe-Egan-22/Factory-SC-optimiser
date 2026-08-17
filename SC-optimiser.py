@@ -39,6 +39,18 @@ def read_data():
     cross_check(bom_df, product_df, inv_df)
     check_repeats(bom_df[["ProductID", "MaterialID"]], 'BOM')
     
+    return {
+        "Products": product_df,
+        "Inventory": inv_df,
+        "AvailableTime": available_time,
+        "BOM": bom_df
+    }
+
+def transform_bom(bom_df):
+    '''
+    Transforms the validated BOM dataframe to more convenient format
+    '''
+
     # Pivot bom table to more convenient format
     bom_piv = (
         bom_df
@@ -49,19 +61,9 @@ def read_data():
             aggfunc = 'sum',
             fill_value=0,
         )
-        .reindex(
-            index = inv_df.index,
-            columns = product_df.index,
-            fill_value=0,
-        )
     )
-    return {
-        "Products": product_df,
-        "BOM": bom_piv,
-        "Inventory": inv_df,
-        "AvailableTime": available_time,
-        "OBOM": bom_df
-    }
+
+    return bom_piv
 
 def check_cols(df, required_cols, name):
     '''
