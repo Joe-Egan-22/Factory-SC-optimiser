@@ -132,7 +132,7 @@ def validate_data(data):
 
     # 1) Check columns of each dataframe
     check_cols(data["Products"], {'ProfitPerUnit', 'MachineHours', 'LabourHours'}, "Products")
-    # BOM is checked in read_data()
+    check_cols(data['BOM'], {"ProductID", "MaterialID"}, "BOM")
     check_cols(data["Inventory"], {'QuantityInStock'}, "Inventory")
 
     # 2) Check for null values within each dataframe
@@ -146,6 +146,19 @@ def validate_data(data):
     check_repeats(data['Inventory'].index, 'Inventory')
 
     return
+
+def prepare_data(data):
+    '''
+    Prepares validated and transformed data
+    '''
+
+    return {
+            "Products": data['Products'],
+            "Inventory": data['Inventory'],
+            "AvailableTime": data['AvailableTime'],
+            "BOM": transform_bom(data['BOM'])
+        }
+
 
 def create_lp_model(data):
     '''
@@ -230,11 +243,13 @@ def main():
     '''
     data = read_data()
 
-    validate_data(data)
+    validate_data(data) # will raise errors if needed
 
-    #model = create_lp_model(data)
+    data = prepare_data(data)
 
-    #solve_model(model)
+    model = create_lp_model(data)
+
+    solve_model(model)
 
     return #print(data['OBOM'][data['OBOM'][['ProductID','MaterialID']].duplicated()])
 
