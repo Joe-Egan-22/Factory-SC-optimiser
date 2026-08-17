@@ -6,6 +6,7 @@ import numpy as np
 PRODUCT_FILE = 'Databases/Finishedproducts.csv'
 BOM_FILE = 'Databases/BOMs.csv'
 INVENTORY_FILE = 'Databases/Rawmaterials.csv'
+ORDER_FILE = 'Databases/Productionorders.csv'
 
 '''
 FOLLOWING GLOBAL VARIABLES DECIDED BASED ON INTERNET SEARCH, 
@@ -26,6 +27,7 @@ def read_data():
     product_df = pd.read_csv(PRODUCT_FILE, delimiter=',', index_col='ProductID')
     bom_df = pd.read_csv(BOM_FILE, delimiter=',')
     inv_df = pd.read_csv(INVENTORY_FILE, delimiter=',',index_col='MaterialID')
+    order_df = pd.read_csv(ORDER_FILE, index_col='ProductID')
 
     # Creating dataframe for maximum time for machining and labour (not given in CSV)
     available_time_dict = {
@@ -38,7 +40,8 @@ def read_data():
         "Products": product_df,
         "Inventory": inv_df,
         "AvailableTime": available_time,
-        "BOM": bom_df
+        "BOM": bom_df,
+        "Orders": order_df
     }
 
 def transform_bom(bom_df):
@@ -134,16 +137,19 @@ def validate_data(data):
     check_cols(data["Products"], {'ProfitPerUnit', 'MachineHours', 'LabourHours'}, "Products")
     check_cols(data['BOM'], {"ProductID", "MaterialID"}, "BOM")
     check_cols(data["Inventory"], {'QuantityInStock'}, "Inventory")
+    check_cols(data['Orders'], {'QuantityToProduce'}, "Orders")
 
     # 2) Check for null values within each dataframe
     check_nulls(data['Products'], "Products")
     check_nulls(data['BOM'], "BOM")
     check_nulls(data['Inventory'], "Inventory")
+    check_nulls(data['Orders'], "Orders")
 
     # 2) Check for repeats in product/material IDs
     check_repeats(data['Products'].index, 'Products')
     cross_check(data['BOM'], data['Products'], data['Inventory'])
     check_repeats(data['Inventory'].index, 'Inventory')
+    check_repeats(data['Orders'].index, 'Orders')
 
     return
 
@@ -156,7 +162,8 @@ def prepare_data(data):
             "Products": data['Products'],
             "Inventory": data['Inventory'],
             "AvailableTime": data['AvailableTime'],
-            "BOM": transform_bom(data['BOM'])
+            "BOM": transform_bom(data['BOM']),
+            'Orders': data['Orders']
         }
 
 
@@ -176,6 +183,7 @@ def create_lp_model(data):
     objective_function(model, data, X)
     material_constraints(model, data, X)
     time_constrains(model, data, X)
+    demand_constraints(model, data, X)
 
     return model
 
@@ -234,6 +242,21 @@ def time_constrains(model, data, X):
                 <= time_rhs[constr],
                 constr
             )
+
+    return model
+
+def demand_constraints(model, data, X):
+    '''
+    Applies demand constraints
+    '''
+
+    min_demands_coefs = data["Orders"]["QuantityToProduce"]
+
+    for product in data['Products'].index:
+        model += (
+            X[product] >= min_demands_coefs[product],
+            f'Min demand of product: {product}'
+        )
 
     return model
 
