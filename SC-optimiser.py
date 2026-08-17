@@ -34,11 +34,6 @@ def read_data():
     }
     available_time = pd.DataFrame(available_time_dict)
 
-    # Check the BOM dataframe before modification
-    check_cols(bom_df, {"ProductID", "MaterialID"}, "BOM")
-    cross_check(bom_df, product_df, inv_df)
-    check_repeats(bom_df[["ProductID", "MaterialID"]], 'BOM')
-    
     return {
         "Products": product_df,
         "Inventory": inv_df,
@@ -147,7 +142,7 @@ def validate_data(data):
 
     # 2) Check for repeats in product/material IDs
     check_repeats(data['Products'].index, 'Products')
-    # BOM checked in read_data()
+    cross_check(data['BOM'], data['Products'], data['Inventory'])
     check_repeats(data['Inventory'].index, 'Inventory')
 
     return
