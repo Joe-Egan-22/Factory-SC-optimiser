@@ -239,26 +239,44 @@ def time_constrains(model, data, X):
 
 def solve_model(model): # may not work, need to fix create_lp_model first
     '''
-    Solves and displays LP model
+    Solves LP model
     '''
-    # Solve model
-    model.solve(pulp.PULP_CBC_CMD(msg=False))
+
+    status = model.solve(pulp.PULP_CBC_CMD(msg=False))
+    status_name = pulp.LpStatus[status]
+
+
+    if status_name != 'Optimal':
+        raise RuntimeError(
+            f"Optimisation failed: {pulp.LpStatus[model.status]}"
+        )
+
+    solution = {
+        v.name: v.value()
+        for v in model.variables()
+    }
+
+    profit = pulp.value(model.objective)
+    
+    return solution, profit
+
+def print_solution(model):
+    '''
+    Prints the solution to the LP problem
+    '''
+
+    solution, profit = solve_model(model)
 
     # Display solution
     print('-------------------------------------')
     print('               SOLUTION              ')
     print('-------------------------------------')
 
-    print('')
-    print(pulp.LpStatus[model.status])
-    print('')
+    print(solution)
 
-    for v in model.variables():
-        print(f"{v}: {v.value():.2f}")
+    print(f'Profit = {profit:.2f}')
 
-    print("Profit =", pulp.value(model.objective))
-
-    return None
+    return
 
 def main():
     '''
@@ -272,7 +290,7 @@ def main():
 
     model = create_lp_model(data)
 
-    solve_model(model)
+    print_solution(model)
 
     return #print(data['OBOM'][data['OBOM'][['ProductID','MaterialID']].duplicated()])
 
