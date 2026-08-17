@@ -183,7 +183,7 @@ def create_lp_model(data):
     objective_function(model, data, X)
     material_constraints(model, data, X)
     time_constrains(model, data, X)
-    demand_constraints(model, data, X)
+    #demand_constraints(model, data, X) #Applying results in infeasible solution
 
     return model
 

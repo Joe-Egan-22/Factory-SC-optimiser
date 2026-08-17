@@ -16,7 +16,7 @@ Download all files from this repository.
 
 Run the program SC-optimiser.py straight away once installation instructions have been followed. The output should read...
 
-![alt text](image.png)
+![alt text](image-1.png)
 
 User is then free to replace csv files within Databases with their own. It is recommended to keep to the format of the files provided.
 
