@@ -22,5 +22,5 @@ def solve_model(model): # may not work, need to fix create_lp_model first
 
     obj = pulp.value(model.objective)
     
-    return {'Products': products, 
-            'Objective': obj}
+    return {'Products': [products], 
+            'Objective': [obj]}
