@@ -314,7 +314,7 @@ def main():
 
     print_solution(model)
 
-    return #print(data['OBOM'][data['OBOM'][['ProductID','MaterialID']].duplicated()])
+    return
 
 if __name__ == "__main__": main()
 
