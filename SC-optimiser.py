@@ -19,11 +19,15 @@ def main():
 
     data = data_prep.prepare_data(data)
 
-    model = model_creation.create_lp_model(data)
+    models = model_creation.create_lp_model(data)
+    profit_model = models['ProfitModel']
+    wastage_model = models['WastageModel']
 
-    solution = model_solver.solve_model(model)
+    profit_solution = model_solver.solve_model(profit_model)
+    wastage_solution = model_solver.solve_model(wastage_model)
 
-    reporting.print_solution(solution)
+    reporting.print_solution(profit_solution, "Profit")
+    reporting.print_solution(wastage_solution, "Materials used")
 
     return
 

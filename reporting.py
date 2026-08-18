@@ -1,8 +1,7 @@
-def print_solution(solution):
+def print_solution(solution, objective):
     '''
     Prints the solution to the LP problem
     '''
-
 
     # Display solution
     print('-------------------------------------')
@@ -10,9 +9,9 @@ def print_solution(solution):
     print('-------------------------------------')
 
     products = solution['Products']
-    profit = solution['Profit']
+    obj = solution['Objective']
     print(products)
 
-    print(f'Profit = {profit:.2f}')
+    print(f'{objective} = {obj:.2f}')
 
     return

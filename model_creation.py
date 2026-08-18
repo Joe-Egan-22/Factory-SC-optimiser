@@ -5,25 +5,27 @@ def create_lp_model(data):
     '''
     Creates the LP model
     '''
-   
+
+    # Create models
+    profit_model = pulp.LpProblem('Profit_Maximisation_Problem', pulp.LpMaximize)
+    wastage_model = pulp.LpProblem('Wastage_Minimisation_Problem', pulp.LpMaximize) # We aim to maximise the amount of materials used
+
+    # Create decision variables
     decision_var_names = data["Products"].index
-
-    # Define lp model
-    model = pulp.LpProblem('Profit_Maximisation_Problem', pulp.LpMaximize)
-
-    # Create decision variable
     X = pulp.LpVariable.dicts('Prod', decision_var_names, lowBound=0, cat='Continuous')
 
-    objective_function(model, data, X)
-    material_constraints(model, data, X)
-    time_constrains(model, data, X)
-    #demand_constraints(model, data, X) #Applying results in infeasible solution
+    profit_objective_function(profit_model, data, X)
+    wastage_objective_function(wastage_model, data, X)
 
-    return model
+    apply_constraints(profit_model, data, X)
+    apply_constraints(wastage_model, data, X)
 
-def objective_function(model, data, X):
+    return {'ProfitModel': profit_model,
+            'WastageModel': wastage_model}
+
+def profit_objective_function(model, data, X):
     '''
-    Creates the objective function for LP problem
+    Creates the objective function for profit
     '''
 
     objective_coeffs = data["Products"]['ProfitPerUnit']
@@ -32,6 +34,21 @@ def objective_function(model, data, X):
     model += pulp.lpSum(
         objective_coeffs[p] * X[p]
         for p in objective_coeffs.index
+    )
+
+    return model
+
+def wastage_objective_function(model, data, vars):
+    '''
+    Creates the objective function for wastage (i.e maximising materials used)
+    '''
+
+    objectve_coeffs = data['MatsUsed']
+
+    # Create linear expression from objective coefficients
+    model += pulp.lpSum(
+        objectve_coeffs[p] * vars[p]
+        for p in objectve_coeffs.index
     )
 
     return model
@@ -91,5 +108,17 @@ def demand_constraints(model, data, X):
             X[product] >= min_demands_coefs[product],
             f'Min demand of product: {product}'
         )
+
+    return model
+
+def apply_constraints(model, data, X):
+    '''
+    Applies all constraints to a LP model
+    '''
+
+    material_constraints(model, data, X)
+    time_constrains(model, data, X)
+    #demand_constraints(model, data, X) #Applying results in infeasible solution
+
 
     return model
