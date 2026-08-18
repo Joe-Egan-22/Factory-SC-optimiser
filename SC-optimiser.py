@@ -25,7 +25,7 @@ def main():
 
     reporting.print_solution(solution)
 
-    return #test comment
+    return
 
 if __name__ == "__main__": main()
 
