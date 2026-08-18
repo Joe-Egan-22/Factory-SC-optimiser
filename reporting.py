@@ -4,9 +4,9 @@ def print_solution(solution, objective):
     '''
 
     # Display solution
-    print('-------------------------------------')
-    print('               SOLUTION              ')
-    print('-------------------------------------')
+    print('--------------------------------------------')
+    print(f'     SOLUTION TO {objective.upper()} PROBLEM       ')
+    print('--------------------------------------------')
 
     products = solution['Products']
     obj = solution['Objective']
