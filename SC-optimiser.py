@@ -1,6 +1,5 @@
 import pulp
 import pandas as pd
-import numpy as np
 
 # Product database input in csv format
 PRODUCT_FILE = 'Databases/Finishedproducts.csv'

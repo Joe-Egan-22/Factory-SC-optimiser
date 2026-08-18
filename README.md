@@ -6,7 +6,9 @@ Code reads CSV files with data on products, material stock and bill of materials
 
 ## Prerequisites
 
-Ensure local system can run python. No other action is needed.
+- Python
+- Pandas
+- PuLP
 
 ## Installation
 
