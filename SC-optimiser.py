@@ -2,12 +2,12 @@ import pulp
 import pandas as pd
 
 # Import modules
-import data_reader
-import validation
-import data_prep
-import model_creation
-import model_solver
-import reporting
+import modules.data_reader as data_reader
+import modules.validation as validation
+import modules.data_prep as data_prep
+import modules.model_creation as model_creation
+import modules.model_solver as model_solver
+import modules.reporting as reporting
 
 def main():
     '''
