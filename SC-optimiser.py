@@ -6,43 +6,22 @@ import data_reader
 import validation
 import data_prep
 import model_creation
+import model_solver
 
-def solve_model(model): # may not work, need to fix create_lp_model first
-    '''
-    Solves LP model
-    '''
-
-    status = model.solve(pulp.PULP_CBC_CMD(msg=False))
-    status_name = pulp.LpStatus[status]
-
-
-    if status_name != 'Optimal':
-        raise RuntimeError(
-            f"Optimisation failed: {pulp.LpStatus[model.status]}"
-        )
-
-    solution = {
-        v.name: v.value()
-        for v in model.variables()
-    }
-
-    profit = pulp.value(model.objective)
-    
-    return solution, profit
-
-def print_solution(model):
+def print_solution(solution):
     '''
     Prints the solution to the LP problem
     '''
 
-    solution, profit = solve_model(model)
 
     # Display solution
     print('-------------------------------------')
     print('               SOLUTION              ')
     print('-------------------------------------')
 
-    print(solution)
+    products = solution['Products']
+    profit = solution['Profit']
+    print(products)
 
     print(f'Profit = {profit:.2f}')
 
@@ -60,7 +39,9 @@ def main():
 
     model = model_creation.create_lp_model(data)
 
-    print_solution(model)
+    solution = model_solver.solve_model(model)
+
+    print_solution(solution)
 
     return
 
