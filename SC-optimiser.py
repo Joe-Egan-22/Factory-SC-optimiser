@@ -7,25 +7,7 @@ import validation
 import data_prep
 import model_creation
 import model_solver
-
-def print_solution(solution):
-    '''
-    Prints the solution to the LP problem
-    '''
-
-
-    # Display solution
-    print('-------------------------------------')
-    print('               SOLUTION              ')
-    print('-------------------------------------')
-
-    products = solution['Products']
-    profit = solution['Profit']
-    print(products)
-
-    print(f'Profit = {profit:.2f}')
-
-    return
+import reporting
 
 def main():
     '''
@@ -41,7 +23,7 @@ def main():
 
     solution = model_solver.solve_model(model)
 
-    print_solution(solution)
+    reporting.print_solution(solution)
 
     return
 
