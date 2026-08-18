@@ -19,6 +19,13 @@ def transform_bom(bom_df):
 
     return bom_piv
 
+def summed_bom(pivot_bom):
+    '''
+    Sums each column of pivoted BOM table and returns series
+    '''
+
+    return pivot_bom.sum()
+
 def prepare_data(data):
     '''
     Prepares validated and transformed data
@@ -29,5 +36,6 @@ def prepare_data(data):
             "Inventory": data['Inventory'],
             "AvailableTime": data['AvailableTime'],
             "BOM": transform_bom(data['BOM']),
-            'Orders': data['Orders']
+            'Orders': data['Orders'],
+            'MatsUsed': summed_bom( transform_bom(data['BOM']) )
         }
