@@ -29,4 +29,23 @@ def create_dataframe(solution):
 
     sol_df = pd.concat([prod_df, obj_df], axis=1)
 
-    return print(sol_df)
+    return sol_df
+
+def create_csv(sol_df):
+    '''
+    Creates and saves a csv from solution dataframe
+    '''
+
+    sol_df.to_csv('Solution.csv', index = False)
+
+    return
+
+def generate_report(solution):
+    '''
+    Generates output from model solution
+    '''
+
+    sol_df = create_dataframe(solution)
+    create_csv(sol_df)
+
+    return

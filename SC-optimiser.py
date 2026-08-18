@@ -26,8 +26,8 @@ def main():
     profit_solution = model_solver.solve_model(profit_model)
     wastage_solution = model_solver.solve_model(wastage_model)
 
-    reporting.create_dataframe(profit_solution)
-    #reporting.print_solution(wastage_solution, "Materials used")
+    reporting.generate_report(profit_solution)
+    #reporting.create_dataframe(wastage_solution)
 
     return
 
