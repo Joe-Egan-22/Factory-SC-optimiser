@@ -8,20 +8,20 @@ def create_lp_model(data):
 
     # Create models
     profit_model = pulp.LpProblem('Profit_Maximisation_Problem', pulp.LpMaximize)
-    wastage_model = pulp.LpProblem('Wastage_Minimisation_Problem', pulp.LpMaximize) # We aim to maximise the amount of materials used
+    material_model = pulp.LpProblem('Material_Maxmimisation_Problem', pulp.LpMaximize) # We aim to maximise the amount of materials used
 
     # Create decision variables
     decision_var_names = data["Products"].index
     X = pulp.LpVariable.dicts('Prod', decision_var_names, lowBound=0, cat='Continuous')
 
     profit_objective_function(profit_model, data, X)
-    wastage_objective_function(wastage_model, data, X)
+    wastage_objective_function(material_model, data, X)
 
     apply_constraints(profit_model, data, X)
-    apply_constraints(wastage_model, data, X)
+    apply_constraints(material_model, data, X)
 
     return {'ProfitModel': profit_model,
-            'WastageModel': wastage_model}
+            'WastageModel': material_model}
 
 def profit_objective_function(model, data, X):
     '''
@@ -38,9 +38,9 @@ def profit_objective_function(model, data, X):
 
     return model
 
-def wastage_objective_function(model, data, vars):
+def material_objective_function(model, data, vars):
     '''
-    Creates the objective function for wastage (i.e maximising materials used)
+    Creates the objective function for material usage (we wish to maximise this to reduce wastage)
     '''
 
     objectve_coeffs = data['MatsUsed']
@@ -75,7 +75,7 @@ def material_constraints(model, data, X):
 
     return model
 
-def time_constrains(model, data, X):
+def time_constraints(model, data, X):
     '''
     Applies time constraints to LP model
     '''
@@ -117,8 +117,10 @@ def apply_constraints(model, data, X):
     '''
 
     material_constraints(model, data, X)
-    time_constrains(model, data, X)
-    #demand_constraints(model, data, X) #Applying results in infeasible solution
+    time_constraints(model, data, X)
+
+
+    demand_constraints(model, data, X) #Applying results in infeasible solution
 
 
     return model
