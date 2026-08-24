@@ -31,11 +31,13 @@ def prepare_data(data):
     Prepares validated and transformed data
     '''
 
+    modified_bom = transform_bom(data['BOM'])
+
     return {
             "Products": data['Products'],
             "Inventory": data['Inventory'],
             "AvailableTime": data['AvailableTime'],
-            "BOM": transform_bom(data['BOM']),
+            "BOM": modified_bom,
             'Orders': data['Orders'],
-            'MatsUsed': summed_bom( transform_bom(data['BOM']) )
+            'MatsUsed': summed_bom( modified_bom )
         }
