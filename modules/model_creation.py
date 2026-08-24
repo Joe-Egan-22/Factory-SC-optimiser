@@ -15,7 +15,7 @@ def create_lp_model(data):
     X = pulp.LpVariable.dicts('Prod', decision_var_names, lowBound=0, cat='Continuous')
 
     profit_objective_function(profit_model, data, X)
-    wastage_objective_function(material_model, data, X)
+    material_objective_function(material_model, data, X)
 
     apply_constraints(profit_model, data, X)
     apply_constraints(material_model, data, X)
