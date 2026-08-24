@@ -1,6 +1,6 @@
 import pandas as pd
 
-def print_solution(solution, objective):
+def print_solution(solution, objective): # No longer used as main output
     '''
     Prints the solution to the LP problem
     '''
