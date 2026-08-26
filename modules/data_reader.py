@@ -19,8 +19,8 @@ def read_data():
 
     # Creating dataframe for maximum time for machining and labour (not given in CSV)
     available_time_dict = {
-        'LabourHours': settings['max_labour_time'],
-        'MachineHours': settings['max_machine_time']
+        'LabourHours': [settings['max_labour_time']],
+        'MachineHours': [settings['max_machine_time']]
     }
     available_time = pd.DataFrame(available_time_dict)
 

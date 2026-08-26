@@ -120,7 +120,7 @@ def apply_constraints(model, data, X):
     time_constraints(model, data, X)
 
 
-    demand_constraints(model, data, X) #Applying results in infeasible solution
+     # demand_constraints(model, data, X) #Applying results in infeasible solution
 
 
     return model
