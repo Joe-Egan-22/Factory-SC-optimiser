@@ -1,19 +1,5 @@
 import pandas as pd
-
-# Product database input in csv format
-PRODUCT_FILE = 'Databases/Finishedproducts.csv'
-BOM_FILE = 'Databases/BOMs.csv'
-INVENTORY_FILE = 'Databases/Rawmaterials.csv'
-ORDER_FILE = 'Databases/Productionorders.csv'
-
-'''
-FOLLOWING GLOBAL VARIABLES DECIDED BASED ON INTERNET SEARCH, 
-NOT INCLUDED IN DATA, NEEDS LATER MODIFICATION
-'''
-
-MAX_LABOUR_TIME = 48 #hpw
-MAX_MACHINE_TIME = 60 #hpw
-
+from modules.config import get_settings
 
 def read_data():
     '''
@@ -21,16 +7,20 @@ def read_data():
     Extracting relevant data from these dataframes.
     Returning as a dictionary
     '''
+
+    settings = get_settings()
+    db_dir = settings['database_dir']
+
     # Create dataframes
-    product_df = pd.read_csv(PRODUCT_FILE, delimiter=',', index_col='ProductID')
-    bom_df = pd.read_csv(BOM_FILE, delimiter=',')
-    inv_df = pd.read_csv(INVENTORY_FILE, delimiter=',',index_col='MaterialID')
-    order_df = pd.read_csv(ORDER_FILE, index_col='ProductID')
+    product_df = pd.read_csv(db_dir / "Finishedproducts.csv", delimiter=',', index_col='ProductID')
+    bom_df = pd.read_csv(db_dir / "BOMs.csv", delimiter=',')
+    inv_df = pd.read_csv(db_dir / "Rawmaterials.csv", delimiter=',',index_col='MaterialID')
+    order_df = pd.read_csv(db_dir / "Productionorders.csv", index_col='ProductID')
 
     # Creating dataframe for maximum time for machining and labour (not given in CSV)
     available_time_dict = {
-        'LabourHours': [MAX_LABOUR_TIME],
-        'MachineHours': [MAX_MACHINE_TIME]
+        'LabourHours': settings['max_labour_time'],
+        'MachineHours': settings['max_machine_time']
     }
     available_time = pd.DataFrame(available_time_dict)
 
